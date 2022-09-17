@@ -1,6 +1,13 @@
 # go-dockerfile
 go容器打包的测试代码
 
+### 功能
+
+- 浏览器访问`0.0.0.0:8888`会输出文案
+- 可将日志文件输出到本地路径
+
+### 代码
+
 代码
 
 ```go
@@ -36,7 +43,8 @@ FROM golang:alpine
 ENV GO111MODULE=on \
     CGO_ENABLED=0 \
     GOOS=linux \
-    GOARCH=amd64
+    GOARCH=amd64 \
+    GO_ENV=dev
 
 # 移动到工作目录：/build
 WORKDIR /build
@@ -58,5 +66,28 @@ EXPOSE 8888
 
 # 启动容器时运行的命令
 CMD ["/dist/app"]
+
+```
+
+### 打包容器
+
+```
+docker build . -t gotest
+```
+
+### 运行
+
+```
+docker run --name gotest -p 8888:8888 gotest
+```
+
+### 挂载目录运行
+
+由于容器删除后里面的内容也会删除所以需要将日志文件等持久化挂载到外部
+
+其中`/Users/macpro/Documents/xiaojing/go-test`是本地绝对路径，`:/app`是日志输出的路径
+
+```
+docker run --name gotest -p 8888:8888 -v /Users/macpro/Documents/xiaojing/go-test:/app -d gotest
 ```
 

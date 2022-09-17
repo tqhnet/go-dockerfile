@@ -1,0 +1,6 @@
+pkg
+vendor
+.build
+.vscode
+.idea
+totemli
