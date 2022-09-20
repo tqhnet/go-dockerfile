@@ -1,11 +1,15 @@
 # go-dockerfile
-go容器打包的测试代码
-
 ### Docker命令大全
 
 ```
 https://www.runoob.com/docker/docker-command-manual.html
 ```
+
+### alpine
+
+https://hub.docker.com/_/alpine/
+
+[Alpine Linux](https://alpinelinux.org/)是一个围绕[musl libc](https://www.musl-libc.org/)和[BusyBox](https://www.busybox.net/)构建的 Linux 发行版。该图像只有 5 MB 大小，并且可以访问比其他基于 BusyBox 的图像更完整的[包存储库。](https://pkgs.alpinelinux.org/)这使得 Alpine Linux 成为实用程序甚至生产应用程序的绝佳镜像库。
 
 ### 功能
 
@@ -43,7 +47,9 @@ func hello(w http.ResponseWriter, _ *http.Request) {
 dockerfile
 
 ```
-FROM golang:alpine
+FROM alpine:latest
+MAINTAINER tqhnet
+ENV VERSION 1.0
 
 # 为我们的镜像设置必要的环境变量
 ENV GO111MODULE=on \
@@ -52,26 +58,25 @@ ENV GO111MODULE=on \
     GOARCH=amd64 \
     GO_ENV=dev
 
-# 移动到工作目录：/build
-WORKDIR /build
+# 在容器根目录 创建一个 apps 目录
+WORKDIR /apps
 
-# 将代码复制到容器中
-COPY . .
+# 拷贝当前目录下 的 可以执行文件
+COPY ./.build/app /apps/app
 
-# 将我们的代码编译成二进制可执行文件app
-RUN go build -o app .
+# 设置时区为上海
+RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+RUN echo 'Asia/Shanghai' >/etc/timezone
 
-# 移动到用于存放生成的二进制文件的 /dist 目录
-WORKDIR /dist
+# 设置编码
+ENV LANG C.UTF-8
 
-# 将二进制文件从 /build 目录复制到这里
-RUN cp /build/app .
-
-# 声明服务端口
+# 暴露端口
 EXPOSE 8888
 
-# 启动容器时运行的命令
-CMD ["/dist/app"]
+# 运行golang程序的命令
+ENTRYPOINT ["/apps/app"]
+
 
 ```
 
@@ -132,4 +137,8 @@ docker start gotest
 - 我的image
 
   `tqhnet/gotest`
+
+### 参考链接
+
+https://zhuanlan.zhihu.com/p/382175578
 
